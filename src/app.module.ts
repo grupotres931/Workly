@@ -1,29 +1,34 @@
 import { Module } from '@nestjs/common';
-import { UsuarioModule } from './usuario/usuario.module';
-import { FuncionarioModule } from './funcionario/funcionario.module';
-import { CategoriaModule } from './categoria/categoria.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Usuario } from './usuario/entities/usuario.entity';
-import { Funcionario } from './funcionario/entities/funcionario.entity';
-import { Categoria } from './categoria/entities/categoria.entity';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { UsuarioModule } from './usuario/usuario.module';
+import { AutenticacaoModule } from './autenticacao/autenticacao.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      /* type: 'mysql', 
-      host: 'localhost',
-      port: 3306,
-      username: 'root',
-      password: 'root',
-      database: 'db',
-      synchronize: true, 
-      */
-     entities: [Usuario, Funcionario, Categoria],
-  }),
-    UsuarioModule,
-    FuncionarioModule,
-    CategoriaModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
 
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (config: ConfigService) => ({
+        type: 'mysql',
+        host: config.get<string>('DB_HOST'),
+        port: Number(config.get<string>('DB_PORT')),
+        username: config.get<string>('DB_USER'),
+        password: config.get<string>('DB_PASS'),
+        database: config.get<string>('DB_NAME'),
+        autoLoadEntities: true,
+        synchronize: true,
+      }),
+      inject: [ConfigService],
+    }),
+
+    UsuarioModule,
+    AutenticacaoModule,
   ],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}

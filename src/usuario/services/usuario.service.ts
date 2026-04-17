@@ -1,9 +1,9 @@
+import * as bcrypt from 'bcryptjs';
 import { BadRequestException, HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 
-import { ILike, Repository } from "typeorm";
-import { DeleteResult } from "typeorm/browser";
 import { Usuario } from "../entities/usuario.entity";
+import { DeleteResult, ILike, Repository } from "typeorm";
 
 @Injectable()
 export class UsuarioService {
@@ -62,19 +62,19 @@ export class UsuarioService {
     }
 
     async create(usuario: Usuario): Promise<Usuario> {
-        const localiza = await this.findByEmailExato(usuario.usuario)
+        const localiza = await this.findByEmailExato(usuario.usuario);
 
         if (localiza) {
-        throw new HttpException("Email já cadastrado!", HttpStatus.BAD_REQUEST);
+            throw new HttpException("Email já cadastrado!", HttpStatus.BAD_REQUEST);
         }
 
-        try { 
-            return await this.usuarioRepository.save(usuario)
-        } catch(error) {
-            throw new BadRequestException("Não foi possível criar um usuário")
-        }
-        
-    }
+        try {
+            usuario.senha = await bcrypt.hash(usuario.senha, 10);
+            return await this.usuarioRepository.save(usuario);
+        } catch (error) {
+            throw new BadRequestException("Não foi possível criar um usuário");
+  }
+}
 
 async update(usuario: Usuario): Promise<Usuario> {
     const localizaId = await this.findById(usuario.id);
@@ -85,6 +85,9 @@ async update(usuario: Usuario): Promise<Usuario> {
     }
 
     try {
+        if (usuario.senha) {
+            usuario.senha = await bcrypt.hash(usuario.senha, 10);
+        }
         const atualizado = this.usuarioRepository.merge(localizaId, usuario);  // O merge combina os dados do usuário vindo do banco (localizaId) com os novos dados recebidos (usuario), preservando campos que não foram enviados
         return await this.usuarioRepository.save(atualizado);
     } catch (error) {
