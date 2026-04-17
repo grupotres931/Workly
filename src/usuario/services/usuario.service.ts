@@ -1,8 +1,9 @@
 import { BadRequestException, HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Usuario } from "../entities/usuario.entity";
+
 import { ILike, Repository } from "typeorm";
 import { DeleteResult } from "typeorm/browser";
+import { Usuario } from "../entities/usuario.entity";
 
 @Injectable()
 export class UsuarioService {
