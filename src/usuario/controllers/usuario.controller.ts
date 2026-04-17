@@ -1,51 +1,30 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Post, Put } from "@nestjs/common";
-import { UsuarioService } from "../services/usuario.service";
+import { Body, Controller, Get, Param, Post, UseGuards } from "@nestjs/common";
+import { ApiBearerAuth } from "@nestjs/swagger";
 import { Usuario } from "../entities/usuario.entity";
+import { UsuarioService } from "../services/usuario.service";
+import { JwtAuthGuard } from "../../autenticacao/guards/jwt-auth.guard";
 
 @Controller("usuarios")
 export class UsuarioController {
 
-    constructor(private readonly usuarioService: UsuarioService) {}
+    constructor(
+        private usuarioService: UsuarioService
+    ) { }
 
+    @ApiBearerAuth()
+    @UseGuards(JwtAuthGuard)
     @Get()
-    @HttpCode(HttpStatus.OK)
-    findAll(): Promise<Usuario[]> {
-        return this.usuarioService.findAll();
+    async findAll(): Promise<Usuario[]> {
+        return await this.usuarioService.findAll();
     }
 
     @Get("/:id")
-    @HttpCode(HttpStatus.OK)
-    findById(@Param('id', ParseIntPipe) id: number): Promise<Usuario>{ 
-    return this.usuarioService.findById(id);
-    }
-
-    @Get("/nome/:nome")
-    @HttpCode(HttpStatus.OK)
-    findByNome(@Param('nome') nome: string): Promise<Usuario[]> {
-        return this.usuarioService.findByNome(nome);
-    }
-
-    @Get("/usuario/:usuario")
-    @HttpCode(HttpStatus.OK)
-    findByEmail(@Param('usuario') email: string): Promise<Usuario> {
-        return this.usuarioService.findByEmail(email)
+    async findById(@Param("id") id: number): Promise<Usuario> {
+        return await this.usuarioService.findById(id);
     }
 
     @Post()
-    @HttpCode(HttpStatus.CREATED)
-    create(@Body() Usuario: Usuario): Promise<Usuario> {
-        return this.usuarioService.create(Usuario);
-    }
-    
-    @Put()
-    @HttpCode(HttpStatus.OK)
-    update(@Body() Usuario: Usuario): Promise<Usuario> {
-        return this.usuarioService.update(Usuario);
-    }
-
-    @Delete("/:id")
-    @HttpCode(HttpStatus.NO_CONTENT)
-    delete(@Param('id', ParseIntPipe) id: number) {
-        return this.usuarioService.delete(id);
+    async create(@Body() usuario: Usuario): Promise<Usuario> {
+        return await this.usuarioService.create(usuario);
     }
 }
