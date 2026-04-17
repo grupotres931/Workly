@@ -1,8 +1,11 @@
-import { IsNotEmpty, MinLength } from 'class-validator';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { IsNotEmpty } from 'class-validator';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Usuario } from '../../usuario/entities/usuario.entity';
+import { Categoria } from '../../categoria/entities/categoria.entity';
 
 @Entity({ name: 'tb_funcionario' })
 export class Funcionario {
+
   @PrimaryGeneratedColumn()
   id!: number;
 
@@ -23,4 +26,12 @@ export class Funcionario {
   salarioBase!: number;
 
   salarioTotal?: number;
+
+  @ManyToOne(() => Usuario, (usuario) => usuario.funcionarios)
+  @JoinColumn({ name: 'usuario_id' })
+  usuario!: Usuario;
+
+  @ManyToOne(() => Categoria, (categoria) => categoria.funcionarios)
+  @JoinColumn({ name: 'categoria_id' })
+  categoria!: Categoria;
 }
