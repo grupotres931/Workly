@@ -18,7 +18,12 @@ export class FuncionarioService {
   }
 
   async findAll(): Promise<Funcionario[]> {
-    const funcionarios = await this.funcionarioRepository.find();
+    const funcionarios = await this.funcionarioRepository.find({
+      relations: {
+        usuario: true,
+        categoria: true,
+      },
+    });
 
     return funcionarios.map((funcionario) => this.calcularSalario(funcionario));
   }
@@ -27,6 +32,10 @@ export class FuncionarioService {
     const funcionario = await this.funcionarioRepository.findOne({
       where: {
         id,
+      },
+      relations: {
+        usuario: true,
+        categoria: true,
       },
     });
 

@@ -1,6 +1,7 @@
 import * as bcrypt from 'bcryptjs';
 import { BadRequestException, HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+
 import { Usuario } from "../entities/usuario.entity";
 import { DeleteResult, ILike, Repository } from "typeorm";
 
