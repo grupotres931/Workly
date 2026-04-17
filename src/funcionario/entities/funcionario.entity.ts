@@ -5,7 +5,6 @@ import { Categoria } from '../../categoria/entities/categoria.entity';
 
 @Entity({ name: 'tb_funcionario' })
 export class Funcionario {
-
   @PrimaryGeneratedColumn()
   id!: number;
 
