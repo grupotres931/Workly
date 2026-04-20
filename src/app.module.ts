@@ -3,32 +3,25 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UsuarioModule } from './usuario/usuario.module';
 import { AutenticacaoModule } from './autenticacao/autenticacao.module';
+import { CategoriaModule } from './categoria/categoria.module';
+import { FuncionarioModule } from './funcionario/funcionario.module';
+import { AppController } from './app.controller';
+import { DevService } from './data/services/dev.service';
+import { ProdService } from './data/services/prod.service';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-    }),
-
+    ConfigModule.forRoot(),
     TypeOrmModule.forRootAsync({
+      useClass: ProdService,  //USAR DEVSERVICE para teste na máquina e PRODSERVICE para teste online
       imports: [ConfigModule],
-      useFactory: (config: ConfigService) => ({
-        type: 'mysql',
-        host: config.get<string>('DB_HOST'),
-        port: Number(config.get<string>('DB_PORT')),
-        username: config.get<string>('DB_USER'),
-        password: config.get<string>('DB_PASS'),
-        database: config.get<string>('DB_NAME'),
-        autoLoadEntities: true,
-        synchronize: true,
-      }),
-      inject: [ConfigService],
     }),
-
-    UsuarioModule,
+    CategoriaModule,
+    FuncionarioModule,
     AutenticacaoModule,
+    UsuarioModule
   ],
-  controllers: [],
+  controllers: [AppController],
   providers: [],
 })
 export class AppModule {}
