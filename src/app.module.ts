@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { UsuarioModule } from './usuario/usuario.module';
 import { AutenticacaoModule } from './autenticacao/autenticacao.module';
 import { CategoriaModule } from './categoria/categoria.module';
@@ -11,17 +11,23 @@ import { ProdService } from './data/services/prod.service';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
-    TypeOrmModule.forRootAsync({
-      useClass: ProdService,  //USAR DEVSERVICE para teste na máquina e PRODSERVICE para teste online
-      imports: [ConfigModule],
+    // 1. Adicionado isGlobal: true para o DevService enxergar o .env
+    ConfigModule.forRoot({
+      isGlobal: true,
     }),
+
+    // 2. Simplificado o forRootAsync
+    TypeOrmModule.forRootAsync({
+      useClass: ProdService, 
+    }),
+
     CategoriaModule,
     FuncionarioModule,
     AutenticacaoModule,
     UsuarioModule
   ],
   controllers: [AppController],
-  providers: [],
+  // 3. Adicionado o DevService e ProdService nos providers para o Nest conseguir injetá-los
+  providers: [DevService, ProdService],
 })
 export class AppModule {}
